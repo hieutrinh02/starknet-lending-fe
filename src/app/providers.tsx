@@ -1,0 +1,33 @@
+// app/providers.tsx
+"use client"
+import { ThemeProvider } from "@/theme/theme"
+import { ColorModeScript } from "@chakra-ui/react"
+import { Provider as JotaiProvider, createStore } from "jotai"
+import { ReactNode, useEffect, useState } from "react"
+
+const jotaiStore = createStore();
+
+export function Providers({ children }: { children: ReactNode }) {
+    // solving white loading flash on dark mode when serving the page
+    // https://brianlovin.com/writing/adding-dark-mode-with-next-js
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) {
+        return <div style={{ visibility: "hidden" }}>{null}</div>
+    }
+
+    const body = (
+        <>
+            <ColorModeScript initialColorMode={"light"} />
+            <JotaiProvider store={jotaiStore}>
+                <ThemeProvider>{children}</ThemeProvider>
+            </JotaiProvider>
+        </>
+    )
+
+    return body
+}
